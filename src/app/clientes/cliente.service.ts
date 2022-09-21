@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Cliente } from './cliente';
-import { catchError, map, Observable, of, throwError } from 'rxjs';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
@@ -16,13 +16,26 @@ export class ClienteService {
 
   getClientes(): Observable<Cliente[]> {
     return this.http.get(this.urlEndPoint).pipe(
+      tap(response => {
+        console.log('ClienteService: tap 1');
+        let clientes = response as Cliente[];
+        clientes.forEach( cliente => {
+          console.log(cliente.nombre);
+        })
+      }),
       map(response => {
         let clientes = response as Cliente[];
         return clientes.map(cliente => {
           cliente.nombre = cliente.nombre.toUpperCase();      
           return cliente;
         });
-      })
+      }),
+      tap(response => {
+        console.log('ClienteService: tap 2');
+        response.forEach( cliente => {
+          console.log(cliente.nombre);
+        })
+      }),
     );
   }
   create(cliente: Cliente) : Observable<Cliente> {
